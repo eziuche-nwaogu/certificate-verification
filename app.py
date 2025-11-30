@@ -68,10 +68,18 @@ def verify_certificate():
         certificate_url = record.get("certificate_url")
         first_name = record.get("first_name", "")
         last_name = record.get("last_name", "")
+        email = record.get("email", "")
+        uuid_val = record.get("unique_id") or record.get("uuid") or record.get("id")
         full_name = f"{first_name} {last_name}".strip()
-        
-        print(f"✅ Rendering certificate: {full_name} with URL: {certificate_url}")
-        return render_template("certificate_display.html", certificate_url=certificate_url, full_name=full_name)
+
+        print(f"✅ Rendering certificate: {full_name} with URL: {certificate_url}, email: {email}, uuid: {uuid_val}")
+        return render_template(
+            "certificate_display.html",
+            certificate_url=certificate_url,
+            full_name=full_name,
+            email=email,
+            uuid=uuid_val
+        )
     
     except Exception as e:
         print(f"❌ EXCEPTION in verify_certificate: {e}")
