@@ -16,27 +16,48 @@ HEADERS = {
 # ---------------- VERIFY CERTIFICATE ----------------
 @app.route("/verify")
 def verify_certificate():
-    uuid = request.args.get("id")
-    if not uuid:
-        return render_template("certificate_invalid.html", message="No UUID provided")
+    try:
+        uuid = request.args.get("id")
+        if not uuid:
+            return render_template("certificate_invalid.html", message="No UUID provided")
 
-    # Query Supabase for the certificate record
-    # Supabase Table: 'certificates' with columns: uuid, first_name, last_name, certificate_url
-    query_url = f"{SUPABASE_URL}/rest/v1/certificates?unique_id=eq.{uuid}"
-    res = requests.get(query_url, headers=HEADERS)
+        # Validate environment variables
+        if not SUPABASE_URL or not SUPABASE_KEY:
+            print("❌ SUPABASE_URL or SUPABASE_KEY is not set")
+            return render_template("certificate_invalid.html", message="Server configuration error"), 500
 
-    if res.status_code != 200:
-        return render_template("certificate_invalid.html", message="Error accessing database")
+        # Query Supabase for the certificate record
+        # Supabase Table: 'certificates' with columns: unique_id, first_name, last_name, certificate_url
+        base_url = SUPABASE_URL.rstrip("/")
+        query_url = f"{base_url}/rest/v1/certificates?unique_id=eq.{uuid}"
+        
+        print(f"🔍 DEBUG: Querying Supabase at {query_url}")
+        print(f"🔍 DEBUG: Headers: apikey={'set' if HEADERS.get('apikey') else 'missing'}, Authorization={'set' if HEADERS.get('Authorization') else 'missing'}")
+        
+        res = requests.get(query_url, headers=HEADERS, timeout=10)
+        print(f"✅ Response status: {res.status_code}")
+        print(f"✅ Response body: {res.text[:500]}")
 
-    data = res.json()
-    if not data:
-        return render_template("certificate_invalid.html", message="Certificate not found")
+        if res.status_code != 200:
+            return render_template("certificate_invalid.html", message=f"Database error: {res.status_code}"), 500
 
-    record = data[0]
-    certificate_url = record.get("certificate_url")
-    full_name = f"{record.get('first_name')} {record.get('last_name')}"
+        data = res.json()
+        if not data:
+            return render_template("certificate_invalid.html", message="Certificate not found")
 
-    return render_template("certificate_display.html", certificate_url=certificate_url, full_name=full_name)
+        record = data[0]
+        certificate_url = record.get("certificate_url")
+        first_name = record.get("first_name", "")
+        last_name = record.get("last_name", "")
+        full_name = f"{first_name} {last_name}".strip()
+
+        return render_template("certificate_display.html", certificate_url=certificate_url, full_name=full_name)
+    
+    except Exception as e:
+        print(f"❌ Error in verify_certificate: {e}")
+        import traceback
+        traceback.print_exc()
+        return render_template("certificate_invalid.html", message=f"Server error: {str(e)}"), 500
 
 # ---------------- HEALTH CHECK ----------------
 @app.route("/")
