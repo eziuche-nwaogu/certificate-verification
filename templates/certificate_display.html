@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Certificate Verified</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 40px; }
+        .box { border: 2px solid #0a4a8f; padding: 30px; border-radius: 10px; display: inline-block; }
+        a { color: #0a4a8f; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>✔ Certificate Verified</h1>
+        <p>This certificate belongs to:</p>
+        <h2>{{ full_name }}</h2>
+        <p>Email: {{ email }}</p>
+        <p><b>Certificate ID:</b> {{ uuid }}</p>
+        <br>
+        <a href="{{ certificate_url }}" target="_blank">📄 Download Certificate</a>
+    </div>
+</body>
+</html>

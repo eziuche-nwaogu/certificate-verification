@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invalid Certificate</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 40px; color: #b30000; }
+        .box { border: 2px solid #b30000; padding: 30px; border-radius: 10px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>❌ Invalid or Unrecognized Certificate</h1>
+        {% if reason %}
+            <p>{{ reason }}</p>
+        {% else %}
+            <p>No matching certificate found in our database.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

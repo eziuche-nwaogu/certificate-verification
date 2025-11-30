@@ -1,0 +1,8 @@
+my_certificate_sender.py
+certificates/
+*.json
+*.db
+__pycache__/
+pix_logo6.png
+certificate_template.jpg
+AlexBrush-Regular.ttf
