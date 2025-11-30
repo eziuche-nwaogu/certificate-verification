@@ -27,8 +27,8 @@ def verify_certificate():
             return render_template("certificate_invalid.html", message="No UUID provided")
 
         # Validate environment variables
-        if not SUPABASE_URL or not SUPABASE_KEY:
-            print("❌ SUPABASE_URL or SUPABASE_KEY is not set")
+        if not SUPABASE_URL or not effective_key:
+            print(f"❌ Missing config: SUPABASE_URL={'set' if SUPABASE_URL else 'NOT SET'}, effective_key={'set' if effective_key else 'NOT SET'}")
             return render_template("certificate_invalid.html", message="Server configuration error"), 500
 
         # Query Supabase for the certificate record
