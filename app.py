@@ -21,14 +21,18 @@ print(f"🔧 SUPABASE_URL={'set' if SUPABASE_URL else 'missing'}, SUPABASE_KEY={
 # ---------------- VERIFY CERTIFICATE ----------------
 @app.route("/verify")
 def verify_certificate():
+    print(f"\n========== /VERIFY ENDPOINT CALLED ==========")
     try:
         uuid = request.args.get("id")
+        print(f"📝 UUID from query param: {uuid}")
         if not uuid:
+            print("❌ No UUID provided")
             return render_template("certificate_invalid.html", message="No UUID provided")
 
         # Validate environment variables
+        print(f"🔧 Config check: SUPABASE_URL={'set' if SUPABASE_URL else 'NOT SET'}, effective_key={'set' if effective_key else 'NOT SET'}")
         if not SUPABASE_URL or not effective_key:
-            print(f"❌ Missing config: SUPABASE_URL={'set' if SUPABASE_URL else 'NOT SET'}, effective_key={'set' if effective_key else 'NOT SET'}")
+            print(f"❌ Missing config")
             return render_template("certificate_invalid.html", message="Server configuration error"), 500
 
         # Query Supabase for the certificate record
@@ -36,30 +40,37 @@ def verify_certificate():
         base_url = SUPABASE_URL.rstrip("/")
         query_url = f"{base_url}/rest/v1/certificates?unique_id=eq.{uuid}"
         
-        print(f"🔍 DEBUG: Querying Supabase at {query_url}")
-        print(f"🔍 DEBUG: Headers: apikey={'set' if HEADERS.get('apikey') else 'missing'}, Authorization={'set' if HEADERS.get('Authorization') else 'missing'}")
+        print(f"� Query URL: {query_url}")
+        print(f"� Auth key present: {bool(HEADERS.get('Authorization'))}")
         
         res = requests.get(query_url, headers=HEADERS, timeout=10)
-        print(f"✅ Response status: {res.status_code}")
-        print(f"✅ Response body: {res.text[:500]}")
+        print(f"📊 HTTP Response Status: {res.status_code}")
+        print(f"📦 Response Body (first 1000 chars): {res.text[:1000]}")
 
         if res.status_code != 200:
+            print(f"❌ Non-200 response from Supabase: {res.status_code}")
             return render_template("certificate_invalid.html", message=f"Database error: {res.status_code}"), 500
 
         data = res.json()
-        if not data:
+        print(f"📋 Parsed JSON data: {data}")
+        
+        if not data or len(data) == 0:
+            print(f"❌ No records found for UUID: {uuid}")
             return render_template("certificate_invalid.html", message="Certificate not found")
 
         record = data[0]
+        print(f"✅ Record found: {record}")
+        
         certificate_url = record.get("certificate_url")
         first_name = record.get("first_name", "")
         last_name = record.get("last_name", "")
         full_name = f"{first_name} {last_name}".strip()
-
+        
+        print(f"✅ Rendering certificate: {full_name} with URL: {certificate_url}")
         return render_template("certificate_display.html", certificate_url=certificate_url, full_name=full_name)
     
     except Exception as e:
-        print(f"❌ Error in verify_certificate: {e}")
+        print(f"❌ EXCEPTION in verify_certificate: {e}")
         import traceback
         traceback.print_exc()
         return render_template("certificate_invalid.html", message=f"Server error: {str(e)}"), 500
