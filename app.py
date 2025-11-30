@@ -7,11 +7,16 @@ app = Flask(__name__)
 # ---------------- CONFIG ----------------
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
 BUCKET_NAME = "certificates"
+# Prefer the service role key for server-side operations if available
+effective_key = SUPABASE_KEY or SUPABASE_SERVICE_ROLE_KEY
 HEADERS = {
-    "apikey": SUPABASE_KEY,
-    "Authorization": f"Bearer {SUPABASE_KEY}"
+    "apikey": effective_key,
+    "Authorization": f"Bearer {effective_key}" if effective_key else ""
 }
+
+print(f"🔧 SUPABASE_URL={'set' if SUPABASE_URL else 'missing'}, SUPABASE_KEY={'set' if SUPABASE_KEY else 'missing'}, SUPABASE_SERVICE_ROLE_KEY={'set' if SUPABASE_SERVICE_ROLE_KEY else 'missing'})")
 
 # ---------------- VERIFY CERTIFICATE ----------------
 @app.route("/verify")
