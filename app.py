@@ -1,6 +1,10 @@
 import os
 from flask import Flask, request, render_template
 import requests
+from dotenv import load_dotenv
+
+# Load environment variables from .env file if it exists
+load_dotenv()
 
 app = Flask(__name__)
 
