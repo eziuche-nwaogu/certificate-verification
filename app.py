@@ -65,7 +65,8 @@ def verify_certificate():
         record = data[0]
         print(f"✅ Record found: {record}")
         
-        certificate_url = record.get("certificate_url")
+        #certificate_url = record.get("certificate_url")
+        certificate_url = record.get("certificate_path")
         first_name = record.get("first_name", "")
         last_name = record.get("last_name", "")
         email = record.get("email", "")
