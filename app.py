@@ -41,13 +41,22 @@ def verify_certificate():
 
         # Query Supabase for the certificate record
         # Supabase Table: 'certificates' with columns: unique_id, first_name, last_name, certificate_url
+        # base_url = SUPABASE_URL.rstrip("/")
+        # query_url = f"{base_url}/rest/v1/certificates?unique_id=eq.{uuid}"
         base_url = SUPABASE_URL.rstrip("/")
-        query_url = f"{base_url}/rest/v1/certificates?unique_id=eq.{uuid}"
+
+        query_url = f"{base_url}/rest/v1/certificates"
         
         print(f"� Query URL: {query_url}")
         print(f"� Auth key present: {bool(HEADERS.get('Authorization'))}")
         
-        res = requests.get(query_url, headers=HEADERS, timeout=10)
+        # res = requests.get(query_url, headers=HEADERS, timeout=10)
+        params = {
+        "select": "*",
+        "unique_id": f"eq.{uuid}"
+        }
+
+        res = requests.get(query_url, headers=HEADERS, params=params, timeout=10)
         print(f"📊 HTTP Response Status: {res.status_code}")
         print(f"📦 Response Body (first 1000 chars): {res.text[:1000]}")
 
