@@ -14,7 +14,7 @@ SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
 BUCKET_NAME = "certificates"
 # Prefer the service role key for server-side operations if available
-effective_key = SUPABASE_KEY or SUPABASE_SERVICE_ROLE_KEY
+effective_key = SUPABASE_SERVICE_ROLE_KEY or SUPABASE_KEY
 HEADERS = {
     "apikey": effective_key,
     "Authorization": f"Bearer {effective_key}" if effective_key else ""
